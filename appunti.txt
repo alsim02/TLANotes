@@ -1,0 +1,78 @@
+TLA+: formal methods in software development
+--
+
+State machine = abstraction, discrete steps
+
+
+example C program
+
+int i;
+void main(){
+	i = someNumber();
+	i = i+1;
+}
+
+Dobbiamo descrivere:
+	1. tutti i possibili valori iniziali delle variabili (pc = program control, gestisce il flusso degli stati).
+
+	INITIAL STATE FORMULA
+
+	(i = 0) /\ (pc = "start")
+
+	2. relazione tra tutti i valori nello stato corrente e dei loro possibili valori nei prossimi
+stati.
+
+	NEXT STATE FORMULA
+
+	IF pc = "start"
+		THEN (i' \in 0..1000) /\ (pc' = "middle")
+		ELSE IF pc = "middle"
+			THEN (i' = i+1) /\ (pc' = "done")
+			ELSE FALSE
+
+better way to write the next state formula
+
+(pc = "start" /\ i' \in 0..1000 /\ pc' = "middle") \/ (pc = "middle" /\ i' = i+1 /\ pc' = "done")
+
+better..
+
+\/  /\ pc = "start" 
+	/\ i' \in 0..1000 
+	/\ pc' = "middle") 
+\/  /\ pc = "middle" 
+	/\ i' = i+1 
+	/\ pc' = "done"
+
+
+we need nondeterminism, alla riga 40 siamo in grado di esprimerlo molto semplicemente con il linguaggio matematico.
+
+====================================
+MODULE SimpleProgram
+
+EXTENDS Integers
+VARIABLES i, pc
+
+Init = (pc = "start") /\ (i=0)
+
+Next =  \/  /\ pc = "start" 
+			/\ i' \in 0..1000 
+			/\ pc' = "middle") 
+		\/  /\ pc = "middle" 
+			/\ i' = i+1 
+			/\ pc' = "done"
+====================================
+
+Quando le spec diventano grandi è bene creare delle definition, e usarle per assemblare formule più grandi.
+
+ad esempio:
+
+
+Pick =  /\ pc = "start" 
+		/\ i' \in 0..1000 
+		/\ pc' = "middle")
+
+Add1 =  /\ pc = "middle" 
+		/\ i' = i+1 
+		/\ pc' = "done"
+
+Next = Pick \/ Add1
